@@ -1,0 +1,36 @@
+/* Maps “Select destination” buttons: match sidebar tertiary style */
+.element-container.st-key-maps button {
+  height: var(--icon-height);
+  width: 100% !important;
+  background: rgba(255,255,255,1) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.element-container.st-key-dest_default button::before {
+    content: "📍 Destination A";
+    font-size: 24px;
+    color: #000;
+    font-weight: bold;
+}
+
+.element-container.st-key-dest_default button::after {
+    /* replace data-dest with native aria-label */
+    content: attr(aria-label);
+    margin-top: var(--label-spacing);
+    font-size: 16px;
+    color: #000 !important;
+    font-weight: bold;
+}
+
+/* hide the default Streamlit label div under each map button */
+.element-container.st-key-maps button > div {
+  display: none !important;
+}

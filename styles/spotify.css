@@ -1,0 +1,108 @@
+:root {
+  /* gradient controls (override via dynamic inline <style>) */
+  --bg-degree: 145deg;
+  --bg-color1: #1ED760;
+  --bg-percent1: 60%;
+  --bg-color2: #121212;
+  --bg-percent2: 99%;
+
+  /* other style constants */
+  --icon-height: 6em;
+  --emoji-size: 30px;
+  --label-spacing: 0;
+  --font-size: 1.5rem;
+}
+
+/* hide header, main menu, footer, deploy & status */
+header[data-testid="stHeader"],
+.stAppHeader { display: none !important; }
+#MainMenu { visibility: hidden !important; }
+footer { visibility: hidden !important; }
+.stDeployButton,
+.stAppDeployButton { display: none !important; }
+[data-testid="stStatusWidget"] { visibility: hidden !important; }
+
+/* hide entire sidebar header */
+section[data-testid="stSidebar"] div[data-testid="stSidebarHeader"] {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* hide the sidebar nav separator bar */
+[data-testid="stSidebarNavSeparator"] {
+  display: none !important;
+}
+
+.block-container { padding-top: 0rem !important; }
+.block-container h1 { margin-top: 0 !important; padding-top: 0 !important; }
+
+[data-testid="stAppViewContainer"] {
+  background: linear-gradient(
+    var(--bg-degree),
+    var(--bg-color1) var(--bg-percent1),
+    var(--bg-color2) var(--bg-percent2)
+  ) !important;
+}
+
+a, a:visited {
+  color: white !important;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+/* Tab list (frosted glass) */
+.stTabs [data-baseweb="tab-list"] {
+  width: 100% !important;
+  display: flex;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 1rem;
+}
+.stTabs [data-baseweb="tab"] {
+  flex: 1;
+  text-align: center;
+  background: transparent !important;
+  color: black !important;
+  font-weight: normal !important;
+  padding: 10px 0;
+}
+.stTabs [aria-selected="true"] {
+  background: rgba(255, 255, 255, 1) !important;
+}
+div[data-baseweb="tab-border"] { display: none !important; }
+
+/* Shared tertiary button styles */
+.element-container button[kind="tertiary"] {
+  height: var(--icon-height);
+  width: 100% !important;
+  background: rgba(255,255,255,1) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.element-container button > div { display: none !important; }
+
+/* Emoji & label for each button */
+.element-container.st-key-spotify button::before {
+  content: "🎵"; font-size: var(--emoji-size);
+}
+.element-container.st-key-spotify button::after {
+  content: "Spotify"; margin-top: var(--label-spacing); font-size: var(--font-size); color: white !important;
+}
+.element-container.st-key-home button::before { content: "🏠"; font-size: var(--emoji-size); }
+.element-container.st-key-weather button::before { content: "☀️"; font-size: var(--emoji-size); }
+.element-container.st-key-maps button::before { content: "🗺️"; font-size: var(--emoji-size); }
+.element-container.st-key-camera button::before { content: "📷"; font-size: var(--emoji-size); }
+.element-container.st-key-mail button::before { content: "📨"; font-size: var(--emoji-size); }
+.element-container.st-key-calendar button::before { content: "📅"; font-size: var(--emoji-size); }
+.element-container.st-key-assist button::before { content: "🤖"; font-size: var(--emoji-size); }
