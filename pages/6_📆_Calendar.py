@@ -14,12 +14,15 @@ from google.auth.transport.requests import Request
 import datetime as _dt
 import json
 import os
+import time
+from asistente import *
+
 st.set_page_config(layout="wide")
 ICON_HEIGHT     = 6       # em units for button height
 EMOGI_SIZE      = 30       # px for emoji font-size
 FONT_SIZE       = 1.5        # rem for label font-size
 LABEL_SPACING   = 0  
-AUTOREFRESH_INTERVAL = 5000  # ms for auto-refresh interval
+AUTOREFRESH_INTERVAL = 60000  # ms for auto-refresh interval
 
 # Auto-refresh every 5 seconds (5000 ms)
 st_autorefresh(interval=AUTOREFRESH_INTERVAL, limit=None, key="refresh")
@@ -99,9 +102,9 @@ def get_events_for_fullcalendar(service):
         })
     return formatted
 
-# --- Main Calendar UI ---
 
-st.title("📅 Calendar")
+
+# --- Main Calendar UI --
 
 # establish or reuse Calendar service
 if 'service' not in st.session_state:
@@ -113,6 +116,20 @@ if 'service' not in st.session_state:
 
 if 'service' in st.session_state:
     events = get_events_for_fullcalendar(st.session_state.service)
+    with st.expander("➕ Create new event"):
+        title      = st.text_input("Title of the event")
+        # separate date/time inputs
+        start_date = st.date_input("Initial date")
+        start_time = st.time_input("Initial time")
+        end_date   = st.date_input("Final date")
+        end_time   = st.time_input("Final time")
+        if st.button("Crear evento", type="tertiary", key="create_event"):
+            create_event(
+                title, start_date, start_time,
+                end_date, end_time,
+                st.session_state.service
+            )
+            st.success("✅ Event Created.")
     calendario_html = f"""
     <!DOCTYPE html><html><head>
       <meta charset='utf-8' />
@@ -137,6 +154,10 @@ if 'service' in st.session_state:
     """
     st.components.v1.html(calendario_html, height=800)
 
+# show assistant result if exists
+if st.session_state.get("calendar_output"):
+    st.write(st.session_state.calendar_output)
+
 with st.sidebar:
     # Display current time, centered at the top of the sidebar
     current_time = datetime.now().strftime("%H:%M")
@@ -155,5 +176,20 @@ with st.sidebar:
             switch_page("Weather")
         if st.button("Home", key="home", type="tertiary"):
             switch_page("Home")
+
+        # Assistant button
+        if st.button("Assistant", key="assist", type="tertiary"):
+            st.session_state.assist_pressed = True
+            st.session_state.assist_time = time.time()
+            json_obj = prompt(API_KEY, calendar_prompt(events))
+            result = json_obj.get("res", "")
+            st.session_state.calendar_output = result
+            st.rerun()
+
+# reset assistant flag after 5 seconds
+if st.session_state.get("assist_pressed") and (time.time() - st.session_state.get("assist_time", 0)) > 5:
+    st.session_state.assist_pressed = False
+    st.session_state.assist_time = 0
+    st.rerun()
 
 

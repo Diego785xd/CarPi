@@ -1,0 +1,4 @@
+FIX calendar gpt 
+FIX SSL fail 
+INTEGRATE weather gpt
+INTEGRATE car control app

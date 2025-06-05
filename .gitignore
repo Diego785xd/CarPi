@@ -3,3 +3,4 @@
 *.cache.sqlite
 .streamlit/secrets.toml
 .DS_Store
+*.mp3

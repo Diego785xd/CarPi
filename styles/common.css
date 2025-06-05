@@ -135,4 +135,28 @@ div[data-baseweb="tab-border"] { display: none !important; }
 .element-container.st-key-assist button::before {
   content: "🤖";
   font-size: var(--emoji-size);
-  }
+}
+
+/* Emoji & label for create-event button (hyphen form) */
+.element-container.st-key-create-event button::before {
+  content: "📆";
+  font-size: var(--emoji-size);
+}
+.element-container.st-key-create-event button::after {
+  content: "Crear evento";
+  margin-top: var(--label-spacing);
+  font-size: var(--font-size);
+  color: white !important;
+}
+
+/* Emoji & label for create-event button (underscore form) */
+.element-container.st-key-create_event button::before {
+  content: "📆";
+  font-size: var(--emoji-size);
+}
+.element-container.st-key-create_event button::after {
+  content: "Create event";
+  margin-top: var(--label-spacing);
+  font-size: "8px";
+  color: black !important;
+}

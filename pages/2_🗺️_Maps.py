@@ -2,8 +2,10 @@ import streamlit as st
 import requests
 import urllib.parse
 import pathlib
+import time  # { changed code }
 from datetime import datetime
 from utils import hide_all_buttons, switch_page
+from asistente import *
 
 # --- Configuración CSS ---
 # Inyectar common.css
@@ -47,7 +49,10 @@ ORIGIN = "19.4270256,-99.1676657"  # Ángel de la Independencia, CDMX
 st.title("Maps")
 
 # Entrada de texto del usuario
-destination = st.text_input("Escribe tu destino:")
+destination = st.text_input(
+    "Escribe tu destino:",
+    value=st.session_state.get("destination", "")  # { changed code }
+)
 
 if destination:
     # Codificamos los valores para URL
@@ -98,3 +103,18 @@ with st.sidebar:
                 switch_page("Weather")
             if st.button("Home", key="home", type="tertiary"):
                 switch_page("Home")
+            if st.button("Assistant", key="assist", type="tertiary"):  # { changed code }
+                st.session_state.assist_pressed = True              # { changed code }
+                st.session_state.assist_time = time.time()          # { changed code }
+                json_obj = prompt(API_KEY, maps_prompt())           # { changed code }
+                func = json_obj.get("func", "")                     # { changed code }
+                args = json_obj.get("args", {})                     # { changed code }
+                if func in ("set_destination", "maps_place"):       # { changed code }
+                    st.session_state.destination = args.get("destination", args.get("place", ""))  # { changed code }
+                st.rerun()                                         # { changed code }
+
+# reset assistant flag after a short delay
+if st.session_state.get("assist_pressed") and (time.time() - st.session_state.get("assist_time", 0)) > 5:  # { changed code }
+    st.session_state.assist_pressed = False          # { changed code }
+    st.session_state.assist_time = 0                 # { changed code }
+    st.rerun()                                       # { changed code }
