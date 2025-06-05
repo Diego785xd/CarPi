@@ -183,7 +183,12 @@ with st.sidebar:
             st.session_state.assist_time = time.time()
             json_obj = prompt(API_KEY, calendar_prompt(events))
             result = json_obj.get("res", "")
-            st.session_state.calendar_output = result
+            func = json_obj.get("func", "")                     # { changed code }
+            args = json_obj.get("args", {}) 
+            args["service"] = st.session_state.service 
+            if func == "create_event":
+                create_event(**args)
+            #st.session_state.calendar_output = result
             st.rerun()
 
 # reset assistant flag after 5 seconds

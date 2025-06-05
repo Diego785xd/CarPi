@@ -292,52 +292,71 @@ def get_next_event(events):
         return None
     # pick the soonest event
     next_dt, next_title = min(items, key=lambda x: x[0])
-    return {
-        'title': next_title,
-        'hour': next_dt.strftime('%H:%M'),
-        'date': next_dt.strftime('%d %B %Y'),
-        'today': _dt.datetime.now().strftime('%d %B %Y'),
-        'current_hour': _dt.datetime.now().strftime('%H:%M')
-    }
+
+    return f"today is { _dt.datetime.now().strftime('%d %B %Y')} and the hour is {_dt.datetime.now().strftime('%H:%M')}, the next event is '{next_title}' at {next_dt.strftime('%H:%M')} on {next_dt.strftime('%d %B %Y')}"
+
+
+import datetime as _dt
 
 def create_event(title: str,
-                 start_date: _dt.date,
-                 start_time: _dt.time,
-                 end_date: _dt.date,
-                 end_time: _dt.time,
+                 start_date: str,   # now expecting “YYYY-MM-DD”
+                 start_time: str,   # now expecting “HH:MM”
+                 end_date: str,
+                 end_time: str,
                  service):
     """
     Creates a Google Calendar event on the 'primary' calendar
-    given a title and start/end dates & times.
+    given a title and start/end dates & times as strings.
     """
-    start_dt = _dt.datetime.combine(start_date, start_time)
-    end_dt   = _dt.datetime.combine(end_date,   end_time)
+
+    # 1) Parse the input strings into date and time objects:
+    #    - start_date “YYYY-MM-DD” → datetime.date
+    #    - start_time “HH:MM”   → datetime.time
+    date_obj = _dt.datetime.strptime(start_date, "%Y-%m-%d").date()
+    time_obj = _dt.datetime.strptime(start_time, "%H:%M").time()
+
+    end_date_obj = _dt.datetime.strptime(end_date, "%Y-%m-%d").date()
+    end_time_obj = _dt.datetime.strptime(end_time, "%H:%M").time()
+
+    # 2) Combine into full datetimes:
+    start_dt = _dt.datetime.combine(date_obj, time_obj)
+    end_dt   = _dt.datetime.combine(end_date_obj, end_time_obj)
+
     event_body = {
-        'summary': title,
-        'start': {'dateTime': start_dt.isoformat(), 'timeZone': 'UTC'},
-        'end':   {'dateTime': end_dt.isoformat(),   'timeZone': 'UTC'},
+        "summary": title,
+        "start": {
+            "dateTime": start_dt.isoformat(),
+            "timeZone": "UTC"
+        },
+        "end": {
+            "dateTime": end_dt.isoformat(),
+            "timeZone": "UTC"
+        }
     }
+
     return service.events().insert(
-        calendarId='primary',
+        calendarId="primary",
         body=event_body
     ).execute()
 
 
+
 def calendar_prompt(events):
+    print(get_next_event(events))
     prompt = f"""
-You are a playful Apple Car Calendar Assistant with access to the following tools:
-1. get_next_event(events): devuelve los detalles del próximo evento.
-2. create_event(title, start_date, start_time, end_date, end_time, service): programa un nuevo evento.
+You are a playful Apple Car Calendar Assistant with access to the following tool:
+
+1. create_event(title, start_date, start_time, end_date, end_time, service): programa un nuevo evento.
 
 Aquí tienes el contexto de tu próximo evento: {get_next_event(events)}
-
+Recuerda sacar la diferencia entre la fecha y la hora del evento. Si hoy es 5 de octubre de 2023 y el evento es el 6 de octubre de 2023 a las 15:00, la diferencia es de 1 día y 2 horas.
 Para cada solicitud del usuario, responde SOLO con un objeto JSON:
 {{"res": "<tu respuesta juguetona>", "func": "<herramienta o vacío>", "args": {{...}}, "lang": "<código de idioma>"}}
 
 Ejemplos:
 ###
 User: "How much time until my next event?"
-Assistant: {{"res": "Your meeting starts in 2 hours and 15 minutes!", "func": "get_next_event", "args": {{}}, "lang": "en"}}
+Assistant: {{"res": "Your meeting starts in 2 hours and 15 minutes!", "func": "", "args": {{}}, "lang": "en"}}
 ###
 User: "Programa cita con el dentista mañana a las 15:00"
 Assistant: {{"res": "¡Listo! He agendado tu cita con el dentista.", "func": "create_event", "args": {{"title":"cita con el dentista","start_date":"2023-10-05","start_time":"15:00","end_date":"2023-10-05","end_time":"16:00","service":{{}}}}, "lang": "es"}}
@@ -347,6 +366,7 @@ Assistant: {{"res": "Lo siento, no puedo ayudar con eso", "func":"", "args": {{}
 
 Ahora, procesa la solicitud del usuario:
 """
+
     return prompt
 
 
